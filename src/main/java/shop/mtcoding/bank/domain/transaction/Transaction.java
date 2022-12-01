@@ -31,7 +31,7 @@ public class Transaction extends AudingTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)) // null 값이 들어갈 수 있기때문
     @ManyToOne(fetch = FetchType.LAZY)
     private Account withdrawAccount; // 출금 계좌
 
