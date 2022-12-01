@@ -10,7 +10,7 @@ public class TransactionReqDto {
     @Getter
     @Setter
     public static class DepositReqDto {
-        private Long depositAccountId;
+        private Long number;
         private Long amount;
         private String gubun;
 

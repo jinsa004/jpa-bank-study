@@ -31,7 +31,7 @@ public class TransactionsService {
             throw new CustomApiException("구분 값 검증 실패", HttpStatus.BAD_REQUEST);
         }
         // 입금계좌 확인
-        Account depositAccountPS = accountRepository.findById(depositReqDto.getDepositAccountId())
+        Account depositAccountPS = accountRepository.findByNumber(depositReqDto.getNumber())
                 .orElseThrow(() -> new CustomApiException("해당 계좌가 없습니다.", HttpStatus.BAD_REQUEST));
 
         // 0원 체크
