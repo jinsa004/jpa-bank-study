@@ -86,6 +86,9 @@ public class Account extends AudingTime {
     }
 
     public void 출금하기(Long amount) {
+        if (amount > balance) {
+            throw new CustomApiException("잔액이 부족합니다.", HttpStatus.BAD_REQUEST);
+        }
         this.balance -= amount;
     }
 }

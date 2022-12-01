@@ -20,13 +20,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shop.mtcoding.bank.config.dummy.DummyEntity;
-import shop.mtcoding.bank.config.enums.TransactionEnum;
 import shop.mtcoding.bank.domain.account.Account;
 import shop.mtcoding.bank.domain.account.AccountRepository;
 import shop.mtcoding.bank.domain.transaction.TransactionRepository;
 import shop.mtcoding.bank.domain.user.User;
 import shop.mtcoding.bank.domain.user.UserRepository;
-import shop.mtcoding.bank.dto.AccountReqDto.AccountSaveReqDto;
 import shop.mtcoding.bank.dto.TransactionReqDto.DepositReqDto;
 import shop.mtcoding.bank.dto.TransactionReqDto.WithdrawReqDto;
 
@@ -103,6 +101,6 @@ public class TransactionApiControllerTest extends DummyEntity {
 
         // then
         resultActions.andExpect(status().isCreated());
-        resultActions.andExpect(jsonPath("$.data.amount").value(700L));
+        resultActions.andExpect(jsonPath("$.data.withdrawAccountBalance").value(300L));
     }
 }
