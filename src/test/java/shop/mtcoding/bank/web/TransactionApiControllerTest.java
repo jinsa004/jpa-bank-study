@@ -79,6 +79,6 @@ public class TransactionApiControllerTest extends DummyEntity {
 
         // then
         resultActions.andExpect(status().isCreated());
-        resultActions.andExpect(jsonPath("$.data.amount").value(500L));
+        resultActions.andExpect(jsonPath("$.data.depositAccountBalance").value(1500));
     }
 }
