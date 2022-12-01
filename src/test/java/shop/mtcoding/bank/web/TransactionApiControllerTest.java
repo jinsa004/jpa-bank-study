@@ -28,6 +28,7 @@ import shop.mtcoding.bank.domain.user.User;
 import shop.mtcoding.bank.domain.user.UserRepository;
 import shop.mtcoding.bank.dto.AccountReqDto.AccountSaveReqDto;
 import shop.mtcoding.bank.dto.TransactionReqDto.DepositReqDto;
+import shop.mtcoding.bank.dto.TransactionReqDto.WithdrawReqDto;
 
 @Sql("classpath:db/truncate.sql") // 롤백 대신 사용 (auto_increment 초기화 + 데이터 비우기)
 @ActiveProfiles("test")
@@ -59,7 +60,6 @@ public class TransactionApiControllerTest extends DummyEntity {
         Account ssarAccount2 = accountRepository.save(newAccount(2222L, ssar));
     }
 
-    @WithUserDetails(value = "ssar", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     public void deposit_test() throws Exception {
         // given
@@ -79,6 +79,30 @@ public class TransactionApiControllerTest extends DummyEntity {
 
         // then
         resultActions.andExpect(status().isCreated());
-        resultActions.andExpect(jsonPath("$.data.depositAccountBalance").value(1500));
+        resultActions.andExpect(jsonPath("$.data.amount").value(500L));
+    }
+
+    @WithUserDetails(value = "ssar", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void withdraw_test() throws Exception {
+        // given
+        Long accountNumber = 1111L;
+        WithdrawReqDto withdrawReqDto = new WithdrawReqDto();
+        withdrawReqDto.setAmount(700L);
+        withdrawReqDto.setPassword("1234");
+        withdrawReqDto.setGubun("WITHDRAW");
+        String requestBody = om.writeValueAsString(withdrawReqDto);
+        System.out.println("테스트 : " + requestBody);
+
+        // when
+        ResultActions resultActions = mvc
+                .perform(post("/api/account/" + accountNumber + "/withdraw").content(requestBody)
+                        .contentType(APPLICATION_JSON_UTF8));
+        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+        System.out.println("테스트 : " + responseBody);
+
+        // then
+        resultActions.andExpect(status().isCreated());
+        resultActions.andExpect(jsonPath("$.data.amount").value(700L));
     }
 }

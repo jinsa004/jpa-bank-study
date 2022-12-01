@@ -84,4 +84,8 @@ public class Account extends AudingTime {
     public void 입금하기(Long amount) {
         this.balance += amount;
     }
+
+    public void 출금하기(Long amount) {
+        this.balance -= amount;
+    }
 }

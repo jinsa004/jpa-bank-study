@@ -14,7 +14,9 @@ import shop.mtcoding.bank.domain.account.AccountRepository;
 import shop.mtcoding.bank.domain.transaction.Transaction;
 import shop.mtcoding.bank.domain.transaction.TransactionRepository;
 import shop.mtcoding.bank.dto.TransactionReqDto.DepositReqDto;
+import shop.mtcoding.bank.dto.TransactionReqDto.WithdrawReqDto;
 import shop.mtcoding.bank.dto.TransactionRespDto.DepositRespDto;
+import shop.mtcoding.bank.dto.TransactionRespDto.WithdrawRespDto;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -23,6 +25,36 @@ public class TransactionsService {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+
+    // /api/account/{number}/withdraw 계좌 계좌번호를 출금
+    @Transactional
+    public WithdrawRespDto 출금하기(WithdrawReqDto withdrawReqDto, Long number, Long userId) {
+        // 구분 값 검증(입금, 출금, 이체)
+        if (TransactionEnum.valueOf(withdrawReqDto.getGubun()) != TransactionEnum.WITHDRAW) {
+            throw new CustomApiException("구분 값 검증 실패", HttpStatus.BAD_REQUEST);
+        }
+        // 출금계좌 존재 확인
+        Account withdrawAccountPS = accountRepository.findByNumber(number)
+                .orElseThrow(() -> new CustomApiException("해당계좌가 존재하지 않습니다.", HttpStatus.BAD_REQUEST));
+        // 0원 체크
+        if (withdrawReqDto.getAmount() <= 0) {
+            throw new CustomApiException("0원은 출금할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+        // 출금계좌 소유자 확인
+        if (withdrawAccountPS.getUser().getId() != userId) {
+            throw new CustomApiException("계좌 소유주가 다릅니다.", HttpStatus.BAD_REQUEST);
+        }
+        // 출금계좌 비밀번호 확인
+        if (!withdrawAccountPS.getPassword().equals(withdrawReqDto.getPassword())) {
+            throw new CustomApiException("비밀번호가 다릅니다.", HttpStatus.BAD_REQUEST);
+        }
+        // 출금하기 (계좌 잔액수정, 트랜잭션 히스토리 작성)
+        withdrawAccountPS.출금하기(withdrawReqDto.getAmount()); // 계좌출금
+        Transaction transaction = withdrawReqDto.toEntity(withdrawAccountPS); // 히스토리 세이브
+        Transaction transactionPS = transactionRepository.save(transaction);
+        // DTO 리턴
+        return new WithdrawRespDto(transactionPS);
+    }
 
     @Transactional
     public DepositRespDto 입금하기(DepositReqDto depositReqDto) {

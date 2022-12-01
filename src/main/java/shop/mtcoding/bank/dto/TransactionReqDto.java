@@ -25,4 +25,23 @@ public class TransactionReqDto {
             return transaction;
         }
     }
+
+    @Getter
+    @Setter
+    public static class WithdrawReqDto {
+        private Long amount;
+        private String password;
+        private String gubun;
+
+        public Transaction toEntity(Account withdrawAccount) {
+            Transaction transaction = Transaction.builder()
+                    .withdrawAccount(withdrawAccount)
+                    .depositAccount(null)
+                    .withdrawAccountBalance(withdrawAccount.getBalance())// 입금시 마다 남는 중간잔액 체크로직
+                    .amount(amount)
+                    .gubun(TransactionEnum.valueOf(gubun))
+                    .build();
+            return transaction;
+        }
+    }
 }

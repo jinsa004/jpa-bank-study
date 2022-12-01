@@ -28,4 +28,21 @@ public class TransactionRespDto {
         }
 
     }
+
+    @Getter
+    @Setter
+    public static class WithdrawRespDto {
+        private Long id;
+        private Long amount;
+        private Long withdrawAccountBalance;
+        private String gubun;
+
+        public WithdrawRespDto(Transaction transaction) {
+            this.id = transaction.getId();
+            this.amount = transaction.getAmount();
+            this.withdrawAccountBalance = transaction.getWithdrawAccountBalance();
+            this.gubun = transaction.getGubun().getValue();
+        }
+
+    }
 }
