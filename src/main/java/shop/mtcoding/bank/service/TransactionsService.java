@@ -40,14 +40,10 @@ public class TransactionsService {
         if (withdrawReqDto.getAmount() <= 0) {
             throw new CustomApiException("0원은 출금할 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
-        // 출금계좌 소유자 확인
-        if (withdrawAccountPS.getUser().getId() != userId) {
-            throw new CustomApiException("계좌 소유주가 다릅니다.", HttpStatus.BAD_REQUEST);
-        }
+        // 출금계좌 소유자 확인 (엔티티에 만들자)
+        withdrawAccountPS.isOwner(userId);
         // 출금계좌 비밀번호 확인
-        if (!withdrawAccountPS.getPassword().equals(withdrawReqDto.getPassword())) {
-            throw new CustomApiException("비밀번호가 다릅니다.", HttpStatus.BAD_REQUEST);
-        }
+        withdrawAccountPS.checkPassword(withdrawReqDto.getPassword());
         // 출금하기 (계좌 잔액수정, 트랜잭션 히스토리 작성)
         withdrawAccountPS.출금하기(withdrawReqDto.getAmount()); // 계좌출금
         Transaction transaction = withdrawReqDto.toEntity(withdrawAccountPS); // 히스토리 세이브
